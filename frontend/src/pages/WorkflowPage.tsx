@@ -6,6 +6,7 @@ import { RepositoryCloner } from '../components/RepositoryCloner';
 import { RepositorySelector } from '../components/RepositorySelector';
 import { RequirementsViewer } from '../components/RequirementsViewer';
 import { BrdDownload } from '../components/BrdDownload';
+import { AstTreeViewer } from '../components/AstTreeViewer';
 import './WorkflowPage.css';
 
 type RepoMode = 'clone' | 'select';
@@ -14,6 +15,7 @@ export function WorkflowPage() {
   const {
     state,
     setModel,
+    setStep,
     handleClone,
     handleSelectRepo,
     handleParse,
@@ -104,13 +106,27 @@ export function WorkflowPage() {
             <p className="workflow-page__description">
               Use tree-sitter to parse source files and extract classes, functions, and structure.
             </p>
-            <button
-              onClick={handleParse}
-              disabled={state.loading}
-              className="workflow-page__parse-button"
-            >
-              {state.loading ? 'Parsing...' : 'Parse Repository'}
-            </button>
+            {!state.parseResult ? (
+              <button
+                onClick={handleParse}
+                disabled={state.loading}
+                className="workflow-page__parse-button"
+              >
+                {state.loading ? 'Parsing...' : 'Parse Repository'}
+              </button>
+            ) : (
+              <>
+                <AstTreeViewer parseResult={state.parseResult} />
+                <div className="workflow-page__parse-actions">
+                  <button
+                    onClick={() => setStep('features')}
+                    className="workflow-page__proceed-button"
+                  >
+                    Proceed to Feature Extraction →
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

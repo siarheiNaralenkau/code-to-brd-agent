@@ -59,7 +59,7 @@ export function useWorkflow() {
     setLoading(true);
     try {
       const result = await parseRepository(state.repoId);
-      setState((s) => ({ ...s, loading: false, parseResult: result, step: 'features' }));
+      setState((s) => ({ ...s, loading: false, parseResult: result }));
     } catch (err) {
       setError(getErrorMessage(err));
     }
