@@ -1,0 +1,29 @@
+.repo-cloner__success {
+  padding: 12px 16px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+}
+
+.repo-cloner__form {
+  display: flex;
+  gap: 8px;
+}
+
+.repo-cloner__input {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.repo-cloner__button {
+  padding: 8px 20px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}

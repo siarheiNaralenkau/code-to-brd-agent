@@ -1,0 +1,17 @@
+.model-selector {
+  margin-bottom: 16px;
+}
+
+.model-selector__label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.model-selector__select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 280px;
+}

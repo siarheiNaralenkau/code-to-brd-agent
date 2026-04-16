@@ -1,0 +1,107 @@
+.workflow-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: system-ui, sans-serif;
+}
+
+.workflow-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.workflow-page__title {
+  margin: 0;
+  font-size: 26px;
+}
+
+.workflow-page__reset-button {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.workflow-page__description {
+  color: #6b7280;
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+.workflow-page__error {
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #dc2626;
+  margin-bottom: 16px;
+}
+
+.workflow-page__card {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.workflow-page__section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.workflow-page__footer {
+  margin-top: 16px;
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: right;
+}
+
+.workflow-page__api-link {
+  color: #94a3b8;
+}
+
+.workflow-page__mode-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0;
+}
+
+.workflow-page__mode-tab {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #6b7280;
+  border-radius: 0;
+}
+
+.workflow-page__mode-tab:hover {
+  color: #374151;
+}
+
+.workflow-page__mode-tab--active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+  font-weight: 600;
+}
+
+.workflow-page__parse-button {
+  padding: 10px 24px;
+  background: #f59e0b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 12px;
+}
