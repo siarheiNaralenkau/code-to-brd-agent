@@ -1,0 +1,288 @@
+/* =========================================================
+   AstTreeViewer — BEM styles
+   Design tokens consistent with WorkflowPage.css
+   ========================================================= */
+
+.ast-tree {
+  margin-top: 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+  font-size: 13px;
+  font-family: system-ui, sans-serif;
+}
+
+/* Header row: repo id, stats, toggle-all button */
+.ast-tree__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 12px;
+}
+
+.ast-tree__header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ast-tree__repo-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ast-tree__stats {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.ast-tree__toggle-all {
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #374151;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ast-tree__toggle-all:hover {
+  background: #e2e8f0;
+}
+
+/* Scrollable tree body */
+.ast-tree__root {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+/* ---- Layer row ---- */
+.ast-tree__layer {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ast-tree__layer:last-child {
+  border-bottom: none;
+}
+
+.ast-tree__layer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ast-tree__layer-header:hover {
+  background: #f8fafc;
+}
+
+.ast-tree__layer-icon {
+  font-size: 14px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ast-tree__layer-name {
+  flex: 1;
+}
+
+.ast-tree__layer-count {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+}
+
+/* ---- File rows ---- */
+.ast-tree__layer-body {
+  padding-left: 16px;
+  border-left: 2px solid #e2e8f0;
+  margin-left: 20px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.ast-tree__file {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ast-tree__file:last-child {
+  border-bottom: none;
+}
+
+.ast-tree__file-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 8px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  color: #374151;
+  min-width: 0;
+}
+
+.ast-tree__file-header:hover {
+  background: #f8fafc;
+  border-radius: 4px;
+}
+
+.ast-tree__file-name {
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ast-tree__file-dir {
+  color: #9ca3af;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+}
+
+/* ---- File detail (expanded) ---- */
+.ast-tree__file-detail {
+  padding: 6px 8px 10px 24px;
+  border-left: 2px dashed #e2e8f0;
+  margin-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ast-tree__detail-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ast-tree__detail-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  white-space: nowrap;
+  padding-top: 2px;
+  min-width: 62px;
+}
+
+.ast-tree__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ast-tree__tag {
+  display: inline-block;
+  padding: 1px 7px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #374151;
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+}
+
+.ast-tree__show-more {
+  padding: 1px 7px;
+  background: transparent;
+  border: 1px dashed #d1d5db;
+  border-radius: 10px;
+  font-size: 11px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.ast-tree__show-more:hover {
+  background: #f1f5f9;
+}
+
+/* ---- Caret ---- */
+.ast-tree__caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #9ca3af;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+  transform: rotate(-90deg); /* collapsed */
+}
+
+.ast-tree__caret--open {
+  transform: rotate(0deg); /* expanded */
+}
+
+/* ---- Language badges ---- */
+.ast-tree__lang-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: #e2e8f0;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.ast-tree__lang-badge--typescript {
+  background: #3178c6;
+  color: #fff;
+}
+
+.ast-tree__lang-badge--tsx {
+  background: #61dafb;
+  color: #1a1a2e;
+}
+
+.ast-tree__lang-badge--javascript {
+  background: #f7df1e;
+  color: #1a1a2e;
+}
+
+.ast-tree__lang-badge--jsx {
+  background: #f7df1e;
+  color: #1a1a2e;
+}
+
+.ast-tree__lang-badge--python {
+  background: #3776ab;
+  color: #fff;
+}
+
+.ast-tree__lang-badge--java {
+  background: #ed8b00;
+  color: #fff;
+}
+
+.ast-tree__lang-badge--go {
+  background: #00add8;
+  color: #fff;
+}
