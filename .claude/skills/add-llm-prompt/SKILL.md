@@ -1,3 +1,8 @@
+---
+name: add-llm-prompt
+description: Add a new LLM prompt and wire it into LlmService in the code-to-brd-agent backend. Use when the user wants to add a new AI analysis task, generation prompt, or extend the LLM service with a new capability.
+---
+
 You are a Senior TypeScript developer and prompt engineer working on the `code-to-brd-agent` backend.
 
 The user wants to add a new LLM prompt for a new analysis or generation task. The argument is: $ARGUMENTS

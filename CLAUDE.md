@@ -40,26 +40,27 @@ Uses NodeJS tree-sitter library to parse the provided github repository.
 
 ---
 
-## Claude Skills (Custom Slash Commands)
+## Claude Skills
 
-This project ships with Claude Skills in `.claude/commands/` to automate common development tasks.
+This project ships with Claude Skills in `.claude/skills/` to automate common development tasks.
 Full documentation with usage examples: [`docs/claude-skills.md`](docs/claude-skills.md)
 
 ### Backend skills
-| Command | Purpose |
-|---------|---------|
+| Skill | Purpose |
+|-------|---------|
 | `/add-endpoint [description]` | Scaffold a new REST endpoint (router + controller + Swagger + types) |
 | `/add-service [description]` | Scaffold a new backend service class |
 | `/add-llm-prompt [description]` | Add a new LLM prompt and wire it into `LlmService` |
 | `/add-language-parser [language]` | Add tree-sitter support for a new programming language |
 
 ### Frontend skills
-| Command | Purpose |
-|---------|---------|
+| Skill | Purpose |
+|-------|---------|
 | `/add-component [description]` | Scaffold a new React TypeScript component |
 | `/add-api-method [description]` | Add a typed API client function and optional workflow handler |
+| `/component-styling` | Enforce CSS/BEM styling conventions across frontend components |
 
 ### Full-stack skills
-| Command | Purpose |
-|---------|---------|
+| Skill | Purpose |
+|-------|---------|
 | `/lint-check` | Run `tsc --noEmit` + ESLint across both workspaces and fix any errors |

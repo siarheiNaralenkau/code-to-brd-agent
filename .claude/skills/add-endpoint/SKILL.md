@@ -1,3 +1,8 @@
+---
+name: add-endpoint
+description: Scaffold a new REST endpoint (router + controller + Swagger + types) in the code-to-brd-agent Express backend. Use when the user wants to add a new API route, HTTP endpoint, or backend handler.
+---
+
 You are a Senior TypeScript/Node.js developer working on the `code-to-brd-agent` backend (Express + TypeScript).
 
 The user wants to add a new REST endpoint. The argument is: $ARGUMENTS

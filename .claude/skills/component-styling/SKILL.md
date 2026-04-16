@@ -1,3 +1,8 @@
+---
+name: component-styling
+description: Enforce CSS/BEM styling conventions in the code-to-brd-agent frontend components. Use when reviewing or fixing component styles, auditing inline style usage, or ensuring BEM naming conventions are followed.
+---
+
 You are a Senior React/TypeScript developer working on the `code-to-brd-agent` frontend.
 
 ## Component Styling Convention
