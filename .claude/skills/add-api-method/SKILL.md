@@ -1,3 +1,8 @@
+---
+name: add-api-method
+description: Add a typed API client function and optional workflow handler to the code-to-brd-agent frontend. Use when the user wants to call a new backend endpoint from the frontend, add a new API client method, or wire a new action into the workflow.
+---
+
 You are a Senior TypeScript developer working on the `code-to-brd-agent` frontend API client.
 
 The user wants to add a new API client method. The argument is: $ARGUMENTS

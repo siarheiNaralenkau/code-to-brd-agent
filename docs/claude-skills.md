@@ -1,6 +1,6 @@
 # Claude Skills — code-to-brd-agent
 
-Custom slash commands (Claude Skills) for this project. Skills live in `.claude/commands/` and are
+Custom slash commands (Claude Skills) for this project. Skills live in `.claude/skills/` and are
 invoked inside Claude Code with `/skill-name [arguments]`.
 
 ---
@@ -22,6 +22,7 @@ invoked inside Claude Code with `/skill-name [arguments]`.
 |-------|---------|---------|
 | Add Component | `/add-component` | Scaffold a new typed React component and integrate it into the workflow |
 | Add API Method | `/add-api-method` | Add a typed API client function and optional `useWorkflow` handler |
+| Component Styling | `/component-styling` | Enforce CSS/BEM styling conventions across frontend components |
 
 ### Full-Stack
 
@@ -37,7 +38,7 @@ invoked inside Claude Code with `/skill-name [arguments]`.
 
 ### `/add-endpoint`
 
-**File**: `.claude/commands/add-endpoint.md`
+**File**: `.claude/skills/add-endpoint/SKILL.md`
 
 Scaffolds a complete REST endpoint following project conventions:
 - Router file with Zod validation and `@openapi` JSDoc annotations
@@ -60,7 +61,7 @@ Scaffolds a complete REST endpoint following project conventions:
 
 ### `/add-service`
 
-**File**: `.claude/commands/add-service.md`
+**File**: `.claude/skills/add-service/SKILL.md`
 
 Scaffolds a new `backend/src/services/<name>.service.ts` class following the project pattern:
 plain TypeScript class, constructor-injected dependencies, `async` methods, `createError` for domain errors.
@@ -79,7 +80,7 @@ plain TypeScript class, constructor-injected dependencies, `async` methods, `cre
 
 ### `/add-llm-prompt`
 
-**File**: `.claude/commands/add-llm-prompt.md`
+**File**: `.claude/skills/add-llm-prompt/SKILL.md`
 
 Creates a new `backend/src/prompts/<name>.prompt.ts` file with a system prompt constant and a user
 prompt builder function, then adds the corresponding method to `LlmService`. Applies prompt caching
@@ -99,7 +100,7 @@ via the Anthropic beta API automatically.
 
 ### `/add-language-parser`
 
-**File**: `.claude/commands/add-language-parser.md`
+**File**: `.claude/skills/add-language-parser/SKILL.md`
 
 Installs the `tree-sitter-<language>` npm package and wires it into `TreeSitterParserService`:
 adds the grammar, registers file extensions, and updates layer detection patterns if needed.
@@ -118,10 +119,10 @@ adds the grammar, registers file extensions, and updates layer detection pattern
 
 ### `/add-component`
 
-**File**: `.claude/commands/add-component.md`
+**File**: `.claude/skills/add-component/SKILL.md`
 
 Scaffolds a new `frontend/src/components/<ComponentName>.tsx` following project conventions:
-named export, props interface, inline styles matching existing components, types from `../types`.
+named export, props interface, BEM CSS classes, types from `../types`.
 Optionally integrates into `WorkflowPage.tsx`.
 
 **Usage examples:**
@@ -138,7 +139,7 @@ Optionally integrates into `WorkflowPage.tsx`.
 
 ### `/add-api-method`
 
-**File**: `.claude/commands/add-api-method.md`
+**File**: `.claude/skills/add-api-method/SKILL.md`
 
 Adds a new typed function to `frontend/src/api/client.ts`. If it's a workflow action, also adds
 a handler to `useWorkflow.ts` and updates `WorkflowState` in `frontend/src/types/index.ts`.
@@ -155,9 +156,26 @@ a handler to `useWorkflow.ts` and updates `WorkflowState` in `frontend/src/types
 
 ---
 
+### `/component-styling`
+
+**File**: `.claude/skills/component-styling/SKILL.md`
+
+Audits and enforces the CSS/BEM conventions across frontend components: no inline static styles,
+BEM naming (`block__element--modifier`), one CSS file per component.
+
+**Usage examples:**
+
+```
+/component-styling — audit all components for inline style violations and BEM naming issues
+
+/component-styling WorkflowPage — check only WorkflowPage.tsx and its CSS file
+```
+
+---
+
 ### `/lint-check`
 
-**File**: `.claude/commands/lint-check.md`
+**File**: `.claude/skills/lint-check/SKILL.md`
 
 Runs a full quality gate across both workspaces:
 
@@ -178,10 +196,10 @@ Reports all errors with file/line references and fixes them if any are found.
 
 ## How Skills Work
 
-Skills are Markdown files in `.claude/commands/`. When you type `/skill-name argument` in Claude Code:
+Skills are folders in `.claude/skills/`, each containing a `SKILL.md` file. When you type `/skill-name argument` in Claude Code:
 
-1. Claude reads the skill's Markdown file as the task specification
-2. `$ARGUMENTS` in the file is replaced with whatever you typed after the command name
+1. Claude reads the skill's `SKILL.md` file as the task specification
+2. `$ARGUMENTS` in the file is replaced with whatever you typed after the skill name
 3. Claude executes the task following the instructions, using the project's actual file paths and conventions
 
 Skills encode your project's conventions once so you don't have to repeat them in every prompt.
@@ -192,7 +210,8 @@ Skills encode your project's conventions once so you don't have to repeat them i
 
 To add a new skill:
 
-1. Create `.claude/commands/<skill-name>.md`
-2. Write the task description with `$ARGUMENTS` as the placeholder for user input
-3. Reference specific file paths, patterns, and conventions from this project
-4. Add an entry to this file under the appropriate section
+1. Create `.claude/skills/<skill-name>/SKILL.md`
+2. Add frontmatter with `name` and `description` fields
+3. Write the task description with `$ARGUMENTS` as the placeholder for user input
+4. Reference specific file paths, patterns, and conventions from this project
+5. Add an entry to this file under the appropriate section

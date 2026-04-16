@@ -1,3 +1,8 @@
+---
+name: lint-check
+description: Run tsc --noEmit + ESLint across both backend and frontend workspaces in code-to-brd-agent and fix any errors. Use when verifying code correctness, before committing, or after making changes across the project.
+---
+
 You are a Senior TypeScript developer working on the `code-to-brd-agent` project.
 
 Run a full lint and type-check pass across both the backend and frontend workspaces, then report results.

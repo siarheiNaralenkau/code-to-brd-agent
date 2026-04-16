@@ -1,3 +1,8 @@
+---
+name: add-language-parser
+description: Add tree-sitter support for a new programming language to the code-to-brd-agent backend parser. Use when the user wants to parse a new language, extend language support, or add a new tree-sitter grammar.
+---
+
 You are a Senior TypeScript/Node.js developer working on the `code-to-brd-agent` backend.
 
 The user wants to add support for a new programming language in the tree-sitter parser. The argument is: $ARGUMENTS

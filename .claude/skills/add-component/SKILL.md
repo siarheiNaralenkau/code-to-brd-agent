@@ -1,3 +1,8 @@
+---
+name: add-component
+description: Scaffold a new React TypeScript component in the code-to-brd-agent frontend. Use when the user wants to create a new UI component, add a new page element, or build a new React component following project conventions.
+---
+
 You are a Senior React/TypeScript developer working on the `code-to-brd-agent` frontend.
 
 The user wants to add a new React component. The argument is: $ARGUMENTS

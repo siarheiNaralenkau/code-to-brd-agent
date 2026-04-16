@@ -227,7 +227,7 @@ npm run start            # Run compiled backend (production)
 ```
 code-to-brd-agent/
 ├── .env.example                  # Environment variable template
-├── .claude/commands/             # Claude Code custom skills (slash commands)
+├── .claude/skills/               # Claude Code custom skills (slash commands)
 ├── docs/                         # Project documentation
 │   ├── claude-skills.md          # Skills reference with usage examples
 │   └── document-generator.agent.md

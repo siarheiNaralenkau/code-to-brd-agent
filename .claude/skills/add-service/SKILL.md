@@ -1,3 +1,8 @@
+---
+name: add-service
+description: Scaffold a new backend service class in the code-to-brd-agent Express backend. Use when the user wants to add a new service, business logic layer, or backend utility class.
+---
+
 You are a Senior TypeScript/Node.js developer working on the `code-to-brd-agent` backend.
 
 The user wants to add a new backend service. The argument is: $ARGUMENTS
