@@ -2,14 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs/promises';
 import { TreeSitterParserService } from '../services/tree-sitter-parser.service';
-import { LlmService } from '../services/llm.service';
 import { BrdStorageService } from '../services/brd-storage.service';
+import { llmService } from '../services/llm.factory';
 import { env } from '../config/env';
 import { createError } from '../middleware/error.middleware';
+import { logger } from '../utils/logger';
 import { BrdRequest } from '../types';
 
 const parserService = new TreeSitterParserService();
-const llmService = new LlmService(env.ANTHROPIC_API_KEY);
 const storageService = new BrdStorageService(path.resolve(env.OUTPUT_ROOT));
 
 export async function generateBrd(
@@ -32,7 +32,7 @@ export async function generateBrd(
     const featureRequirements = await storageService.readFeatureRequirements(repoId, jobId);
 
     // Parse repo again for AST context
-    console.log(`[brd] Re-parsing ${repoId} for BRD context...`);
+    logger.log(`[brd] Re-parsing ${repoId} for BRD context...`);
     const parseResult = await parserService.parseRepository(repoPath);
 
     // Generate BRD via LLM

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 export interface AppError extends Error {
   statusCode?: number;
@@ -13,9 +14,9 @@ export function errorMiddleware(
   const statusCode = err.statusCode ?? 500;
   const message = err.message || 'Internal Server Error';
 
-  console.error(`[Error] ${statusCode}: ${message}`);
+  logger.error(`[Error] ${statusCode}: ${message}`);
   if (err.stack && process.env.NODE_ENV === 'development') {
-    console.error(err.stack);
+    logger.error(err.stack);
   }
 
   res.status(statusCode).json({ error: message });

@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { RepoInfo } from '../types';
 import { createError } from '../middleware/error.middleware';
+import { logger } from '../utils/logger';
 
 const ALLOWED_HOSTS = ['github.com', 'gitlab.com', 'bitbucket.org'];
 
@@ -20,10 +21,10 @@ export class GitCloneService {
     const alreadyExists = await this.hasGitDir(repoPath);
 
     if (alreadyExists) {
-      console.log(`[git] Repo ${repoId} exists — pulling latest`);
+      logger.log(`[git] Repo ${repoId} exists — pulling latest`);
       await simpleGit(repoPath).pull();
     } else {
-      console.log(`[git] Cloning ${url} -> ${repoPath}`);
+      logger.log(`[git] Cloning ${url} -> ${repoPath}`);
       await simpleGit().clone(url, repoPath, ['--depth', '1']);
     }
 

@@ -3,6 +3,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { BrdMeta } from '../types';
 import { createError } from '../middleware/error.middleware';
+import { logger } from '../utils/logger';
 
 export class BrdStorageService {
   constructor(private outputRoot: string) {}
@@ -12,7 +13,7 @@ export class BrdStorageService {
     await fs.mkdir(dir, { recursive: true });
     const filePath = path.join(dir, 'feature-level-requirements.md');
     await fs.writeFile(filePath, content, 'utf-8');
-    console.log(`[storage] Feature requirements saved: ${filePath}`);
+    logger.log(`[storage] Feature requirements saved: ${filePath}`);
     return filePath;
   }
 
@@ -36,7 +37,7 @@ export class BrdStorageService {
     await fs.mkdir(dir, { recursive: true });
     const filePath = path.join(dir, filename);
     await fs.writeFile(filePath, content, 'utf-8');
-    console.log(`[storage] BRD saved: ${filePath}`);
+    logger.log(`[storage] BRD saved: ${filePath}`);
     return { brdId, filePath, filename };
   }
 

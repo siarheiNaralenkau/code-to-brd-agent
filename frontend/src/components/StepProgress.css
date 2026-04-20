@@ -20,6 +20,14 @@
   color: #fff;
 }
 
+.step-progress__item--clickable {
+  cursor: pointer;
+}
+
+.step-progress__item--clickable:hover {
+  background: #16a34a;
+}
+
 .step-progress__item--active {
   background: #3b82f6;
   color: #fff;
