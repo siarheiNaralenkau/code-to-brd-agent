@@ -43,7 +43,7 @@ export function WorkflowPage() {
         Clone a GitHub repository or select an existing one, parse it with tree-sitter, and generate a Business Requirements Document using Claude.
       </p>
 
-      <StepProgress currentStep={state.step} />
+      <StepProgress currentStep={state.step} onStepClick={setStep} />
 
       <ModelSelector value={state.model} onChange={setModel} disabled={state.loading} />
 
@@ -55,7 +55,7 @@ export function WorkflowPage() {
 
       <div className="workflow-page__card">
         {/* Step 1: Repository — clone new or select existing */}
-        {state.step === 'clone' && !state.repoId && (
+        {state.step === 'clone' && (
           <>
             <div className="workflow-page__mode-tabs">
               <button

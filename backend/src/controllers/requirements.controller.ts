@@ -3,14 +3,14 @@ import path from 'path';
 import fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { TreeSitterParserService } from '../services/tree-sitter-parser.service';
-import { LlmService } from '../services/llm.service';
 import { BrdStorageService } from '../services/brd-storage.service';
+import { llmService } from '../services/llm.factory';
 import { env } from '../config/env';
 import { createError } from '../middleware/error.middleware';
+import { logger } from '../utils/logger';
 import { FeaturesRequest } from '../types';
 
 const parserService = new TreeSitterParserService();
-const llmService = new LlmService(env.ANTHROPIC_API_KEY);
 const storageService = new BrdStorageService(path.resolve(env.OUTPUT_ROOT));
 
 export async function extractFeatures(
@@ -29,7 +29,7 @@ export async function extractFeatures(
     }
 
     // Parse the repository
-    console.log(`[requirements] Parsing ${repoId}...`);
+    logger.log(`[requirements] Parsing ${repoId}...`);
     const parseResult = await parserService.parseRepository(repoPath);
 
     if (parseResult.fileCount === 0) {

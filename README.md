@@ -24,7 +24,7 @@ The BRD is saved as a Markdown file and made available for download.
 |-------|-----------|
 | Backend | Node.js 20+, TypeScript, Express |
 | AST parsing | tree-sitter (TypeScript, JavaScript, Python, Java, Go) |
-| LLM | Anthropic Claude via `@anthropic-ai/sdk` (with prompt caching) |
+| LLM | Anthropic Claude (direct via `@anthropic-ai/sdk`) or SAP AI Core foundation models |
 | API docs | Swagger UI (`swagger-jsdoc` + `swagger-ui-express`) |
 | Frontend | React 18, TypeScript, Vite |
 | Monorepo | npm workspaces |
@@ -38,7 +38,8 @@ The BRD is saved as a Markdown file and made available for download.
 | Node.js | 20 or higher | Required for `tree-sitter` native module compatibility |
 | npm | 10 or higher | Included with Node.js 20 |
 | Git | any recent version | Must be available on `PATH` — used by `simple-git` to clone repositories |
-| Anthropic API key | — | Get one at [console.anthropic.com](https://console.anthropic.com) |
+| Anthropic API key | — | Required when `LLM_TYPE=Claude`. Get one at [console.anthropic.com](https://console.anthropic.com) |
+| SAP AI Core credentials | — | Required when `LLM_TYPE=SAP`. See [SAP LLM Configuration](#sap-llm-configuration) below |
 
 > **Windows users**: `tree-sitter` compiles a native Node.js add-on. If `npm install` fails with
 > a build error, install the Visual Studio C++ build tools:
@@ -77,9 +78,21 @@ Open `.env` and set the following variables:
 PORT=3000                          # Port the backend listens on
 NODE_ENV=development               # 'development' | 'production' | 'test'
 
-# ── Anthropic ─────────────────────────────────────────────────────────────────
-ANTHROPIC_API_KEY=sk-ant-...       # Required — your Anthropic API key
+# ── LLM provider ──────────────────────────────────────────────────────────────
+LLM_TYPE=Claude                    # 'Claude' | 'SAP'
+
+# ── Anthropic (required when LLM_TYPE=Claude) ─────────────────────────────────
+ANTHROPIC_API_KEY=sk-ant-...       # Your Anthropic API key
 ANTHROPIC_MODEL=claude-haiku-4-5   # Default model used when none is specified in the request
+
+# ── SAP LLM (required when LLM_TYPE=SAP) ─────────────────────────────────────
+SAP_LLM_ENDPOINT_URL=https://api.ai.prod.eu-central-1.aws.ml.hana.ondemand.com
+SAP_LLM_FOUNDATION_MODEL_TO_USE=anthropic--claude-4.6-sonnet
+SAP_LLM_DEPLOYMENT_ID=            # Your SAP AI Core deployment ID
+SAP_LLM_AUTH_URL=                 # OAuth2 token endpoint base URL
+SAP_LLM_AUTH_CLIENT_ID=           # OAuth2 client ID
+SAP_LLM_AUTH_CLIENT_SECRET=       # OAuth2 client secret
+SAP_LLM_ANTHROPIC_VERSION=bedrock-2023-05-31
 
 # ── Storage ───────────────────────────────────────────────────────────────────
 REPOS_ROOT=./data/repos            # Where cloned repositories are stored (relative to backend/)
@@ -88,7 +101,7 @@ OUTPUT_ROOT=./data/outputs         # Where generated BRDs and feature docs are s
 
 > The `data/` directories are created automatically on first use — you do not need to create them manually.
 
-### Model options
+### Model options (LLM_TYPE=Claude)
 
 | Model ID | Speed | Quality |
 |----------|-------|---------|
@@ -97,6 +110,52 @@ OUTPUT_ROOT=./data/outputs         # Where generated BRDs and feature docs are s
 | `claude-opus-4-5` | Most capable | Best for large or complex codebases |
 
 The model can also be overridden per-request via the `model` field in the request body.
+
+---
+
+## SAP LLM Configuration
+
+When `LLM_TYPE=SAP` the application routes all LLM calls through **SAP AI Core** instead of calling the Anthropic API directly. SAP AI Core proxies the request to the underlying foundation model (Anthropic Claude) and handles billing and access control within the SAP ecosystem.
+
+### How it works
+
+```
+Backend  →  OAuth2 token request  →  SAP Auth Server
+        →  POST /v2/inference/deployments/{id}/invoke  →  SAP AI Core  →  Claude
+```
+
+1. On each LLM call the backend fetches a short-lived OAuth2 Bearer token from the SAP auth server (token is cached for its full lifetime, minus a 60-second safety margin, so only one token fetch is needed per session).
+2. The request body uses the standard Anthropic Messages API format (`anthropic_version`, `max_tokens`, `system`, `messages`). The `model` field is **not** sent — the deployed model is identified by `SAP_LLM_DEPLOYMENT_ID` in the URL.
+3. The response is the standard Anthropic Messages API response (`content[].text`).
+
+> **Note:** SAP AI Core does not support Anthropic prompt caching (`betas: ['prompt-caching-2024-07-31']`). When `LLM_TYPE=SAP`, prompt caching is disabled automatically.
+
+### Required environment variables
+
+| Variable | Description | Example value |
+|----------|-------------|---------------|
+| `SAP_LLM_ENDPOINT_URL` | Base URL of the SAP AI Core inference API | `https://api.ai.prod.eu-central-1.aws.ml.hana.ondemand.com` |
+| `SAP_LLM_FOUNDATION_MODEL_TO_USE` | Foundation model identifier (informational) | `anthropic--claude-4.6-sonnet` |
+| `SAP_LLM_DEPLOYMENT_ID` | SAP AI Core deployment ID for the target model | `d9bd703c16cee44a` |
+| `SAP_LLM_AUTH_URL` | Base URL of the SAP OAuth2 authorization server | `https://<tenant>.authentication.<region>.hana.ondemand.com` |
+| `SAP_LLM_AUTH_CLIENT_ID` | OAuth2 client ID | `sb-<uuid>!b<n>\|aisvc-...` |
+| `SAP_LLM_AUTH_CLIENT_SECRET` | OAuth2 client secret | `<secret>` |
+| `SAP_LLM_ANTHROPIC_VERSION` | Anthropic API version string required by SAP | `bedrock-2023-05-31` |
+
+### Authentication flow
+
+The backend uses the **OAuth2 Client Credentials** grant:
+
+```
+POST {SAP_LLM_AUTH_URL}/oauth/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials
+&client_id={SAP_LLM_AUTH_CLIENT_ID}
+&client_secret={SAP_LLM_AUTH_CLIENT_SECRET}
+```
+
+The returned `access_token` (Bearer) is attached to every inference request. Tokens are cached in memory and refreshed automatically before expiry.
 
 ---
 
@@ -237,6 +296,9 @@ code-to-brd-agent/
 │       ├── routes/               # Express routers with Swagger JSDoc
 │       ├── controllers/          # Request handlers
 │       ├── services/             # Business logic (git, parser, LLM, storage)
+│       │   ├── llm.service.ts    # Anthropic direct — uses @anthropic-ai/sdk with prompt caching
+│       │   ├── sap.llm.service.ts# SAP AI Core — OAuth2 + inference HTTP calls
+│       │   └── llm.factory.ts    # Singleton: selects LlmService or SapLlmService via LLM_TYPE
 │       ├── prompts/              # LLM system + user prompt templates
 │       ├── middleware/           # Error handling, request validation
 │       ├── swagger/              # OpenAPI spec definition

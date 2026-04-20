@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { TreeSitterParserService } from '../services/tree-sitter-parser.service';
 import { env } from '../config/env';
 import { createError } from '../middleware/error.middleware';
+import { logger } from '../utils/logger';
 
 const parserService = new TreeSitterParserService();
 
@@ -22,7 +23,7 @@ export async function parseRepository(
       throw createError(`Repository '${repoId}' not found. Clone it first.`, 404);
     }
 
-    console.log(`[parse] Parsing ${repoId}...`);
+    logger.log(`[parse] Parsing ${repoId}...`);
     const result = await parserService.parseRepository(repoPath);
     res.status(200).json(result);
   } catch (err) {

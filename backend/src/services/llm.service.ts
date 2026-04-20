@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { logger } from '../utils/logger';
 import {
   FEATURE_EXTRACTION_SYSTEM_PROMPT,
   buildFeatureExtractionUserPrompt,
@@ -16,7 +17,7 @@ export class LlmService {
   }
 
   async extractFeatureRequirements(astSummary: string, model: string): Promise<string> {
-    console.log(`[llm] Extracting feature requirements with model ${model}...`);
+    logger.log(`[llm] Extracting feature requirements with model ${model}...`);
     // Use beta.messages for prompt caching support
     const response = await this.client.beta.messages.create({
       model,
@@ -45,7 +46,7 @@ export class LlmService {
     astSummary: string,
     model: string,
   ): Promise<string> {
-    console.log(`[llm] Generating BRD with model ${model}...`);
+    logger.log(`[llm] Generating BRD with model ${model}...`);
     const response = await this.client.beta.messages.create({
       model,
       max_tokens: 16000,
