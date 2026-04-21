@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { TreeSitterParserService } from '../services/tree-sitter-parser.service';
 import { BrdStorageService } from '../services/brd-storage.service';
 import { llmService } from '../services/llm.factory';
+import { tokenUsageService } from '../services/token-usage.service';
 import { env } from '../config/env';
 import { createError } from '../middleware/error.middleware';
 import { logger } from '../utils/logger';
@@ -37,21 +38,22 @@ export async function extractFeatures(
     }
 
     // Extract feature requirements via LLM
-    const rawText = await llmService.extractFeatureRequirements(parseResult.astSummary, model);
+    const llmResult = await llmService.extractFeatureRequirements(parseResult.astSummary, model);
 
     // Save to storage
     const jobId = uuidv4();
-    await storageService.saveFeatureRequirements(repoId, jobId, rawText);
+    await storageService.saveFeatureRequirements(repoId, jobId, llmResult.text);
 
     // Parse the LLM output into structured features (best-effort)
-    const features = parseFeatureText(rawText);
+    const features = parseFeatureText(llmResult.text);
 
     res.status(200).json({
       jobId,
       repoId,
       features,
-      rawText,
+      rawText: llmResult.text,
       generatedAt: new Date().toISOString(),
+      tokenUsage: tokenUsageService.calculateCost(llmResult.usage),
     });
   } catch (err) {
     next(err);

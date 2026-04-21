@@ -1,4 +1,4 @@
-import type { FeaturesResponse, ParseResponse } from '../types';
+import type { FeaturesResponse, ParseResponse, TokenUsageSummary } from '../types';
 import './RequirementsViewer.css';
 
 interface RequirementsViewerProps {
@@ -64,6 +64,13 @@ export function RequirementsViewer({
             )}
           </div>
 
+          {featuresResult.tokenUsage && (
+            <TokenUsagePanel
+              title="Step 3 — Feature Extraction"
+              usage={featuresResult.tokenUsage}
+            />
+          )}
+
           {step === 'brd' && (
             <button
               onClick={onGenerateBrd}
@@ -79,11 +86,43 @@ export function RequirementsViewer({
   );
 }
 
+export function TokenUsagePanel({ title, usage }: { title: string; usage: TokenUsageSummary }) {
+  return (
+    <div className="token-usage-panel">
+      <div className="token-usage-panel__header">{title} — Token Usage &amp; Cost</div>
+      <div className="token-usage-panel__grid">
+        <TokenStat label="Input tokens" value={usage.inputTokens.toLocaleString()} />
+        <TokenStat label="Output tokens" value={usage.outputTokens.toLocaleString()} />
+        {usage.cacheCreationInputTokens > 0 && (
+          <TokenStat label="Cache write tokens" value={usage.cacheCreationInputTokens.toLocaleString()} />
+        )}
+        {usage.cacheReadInputTokens > 0 && (
+          <TokenStat label="Cache read tokens" value={usage.cacheReadInputTokens.toLocaleString()} />
+        )}
+        <TokenStat
+          label="Estimated cost"
+          value={`$${usage.totalCost.toFixed(6)}`}
+          highlight
+        />
+      </div>
+    </div>
+  );
+}
+
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="stat">
       <div className="stat__value">{value}</div>
       <div className="stat__label">{label}</div>
+    </div>
+  );
+}
+
+function TokenStat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className={`token-stat${highlight ? ' token-stat--highlight' : ''}`}>
+      <span className="token-stat__label">{label}:</span>
+      <span className="token-stat__value">{value}</span>
     </div>
   );
 }

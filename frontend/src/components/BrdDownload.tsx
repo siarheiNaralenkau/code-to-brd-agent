@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import type { BrdResponse } from '../types';
 import { getBrdDownloadUrl } from '../api/client';
+import { TokenUsagePanel } from './RequirementsViewer';
 import './BrdDownload.css';
 
 interface BrdDownloadProps {
@@ -26,6 +27,10 @@ export function BrdDownload({ brdResult }: BrdDownloadProps) {
       <div className="brd-download__meta">
         {brdResult.filename} &bull; Generated {new Date(brdResult.generatedAt).toLocaleString()}
       </div>
+
+      {brdResult.tokenUsage && (
+        <TokenUsagePanel title="Step 4 — BRD Generation" usage={brdResult.tokenUsage} />
+      )}
 
       <div className="brd-download__preview">
         <ReactMarkdown>{brdResult.previewText}</ReactMarkdown>

@@ -1,3 +1,11 @@
+export interface TokenUsageSummary {
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationInputTokens: number;
+  cacheReadInputTokens: number;
+  totalCost: number; // USD
+}
+
 export interface RepoInfo {
   repoId: string;
   name: string;
@@ -41,6 +49,7 @@ export interface FeaturesResponse {
   features: Feature[];
   rawText: string;
   generatedAt: string;
+  tokenUsage?: TokenUsageSummary;
 }
 
 export interface BrdResponse {
@@ -50,6 +59,7 @@ export interface BrdResponse {
   downloadUrl: string;
   previewText: string;
   generatedAt: string;
+  tokenUsage?: TokenUsageSummary;
 }
 
 export type WorkflowStep = 'clone' | 'parse' | 'features' | 'brd';

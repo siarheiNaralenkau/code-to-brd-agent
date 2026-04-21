@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { TreeSitterParserService } from '../services/tree-sitter-parser.service';
 import { BrdStorageService } from '../services/brd-storage.service';
 import { llmService } from '../services/llm.factory';
+import { tokenUsageService } from '../services/token-usage.service';
 import { env } from '../config/env';
 import { createError } from '../middleware/error.middleware';
 import { logger } from '../utils/logger';
@@ -36,22 +37,23 @@ export async function generateBrd(
     const parseResult = await parserService.parseRepository(repoPath);
 
     // Generate BRD via LLM
-    const brdContent = await llmService.generateBrd(
+    const llmResult = await llmService.generateBrd(
       featureRequirements,
       parseResult.astSummary,
       model,
     );
 
     // Save BRD
-    const { brdId, filename } = await storageService.saveBrd(repoId, brdContent);
+    const { brdId, filename } = await storageService.saveBrd(repoId, llmResult.text);
 
     res.status(200).json({
       brdId,
       repoId,
       filename,
       downloadUrl: `/api/brd/${brdId}/download`,
-      previewText: brdContent.slice(0, 2000),
+      previewText: llmResult.text.slice(0, 2000),
       generatedAt: new Date().toISOString(),
+      tokenUsage: tokenUsageService.calculateCost(llmResult.usage),
     });
   } catch (err) {
     next(err);

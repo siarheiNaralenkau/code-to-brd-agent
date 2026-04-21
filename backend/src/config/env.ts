@@ -19,6 +19,8 @@ const EnvSchema = z
     SAP_LLM_AUTH_CLIENT_ID: z.string().optional(),
     SAP_LLM_AUTH_CLIENT_SECRET: z.string().optional(),
     SAP_LLM_ANTHROPIC_VERSION: z.string().optional(),
+    LLM_MAX_OUTPUT_TOKENS: z.coerce.number().default(16000),
+    LLM_REQUEST_TIMEOUT_SECONDS: z.coerce.number().default(600),
     REPOS_ROOT: z.string().default('./data/repos'),
     OUTPUT_ROOT: z.string().default('./data/outputs'),
     FRONTEND_URL: z.string().default('http://localhost:5173'),

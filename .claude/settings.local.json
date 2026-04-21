@@ -6,7 +6,8 @@
       "Bash(npx tsc *)",
       "Bash(node -e \"const P = require\\('tree-sitter'\\); console.log\\(Object.keys\\(P.prototype || P\\)\\); console.log\\(typeof P\\);\")",
       "Bash(npx eslint *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(npm uninstall *)"
     ]
   }
 }
