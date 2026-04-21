@@ -4,6 +4,7 @@ import fs from 'fs/promises';
 import { RepoInfo } from '../types';
 import { createError } from '../middleware/error.middleware';
 import { logger } from '../utils/logger';
+import { env } from '../config/env';
 
 const ALLOWED_HOSTS = ['github.com', 'gitlab.com', 'bitbucket.org'];
 
@@ -19,13 +20,15 @@ export class GitCloneService {
     await fs.mkdir(this.reposRoot, { recursive: true });
 
     const alreadyExists = await this.hasGitDir(repoPath);
+    const authenticatedUrl = this.injectToken(url);
 
     if (alreadyExists) {
       logger.log(`[git] Repo ${repoId} exists — pulling latest`);
+      await simpleGit(repoPath).remote(['set-url', 'origin', authenticatedUrl]);
       await simpleGit(repoPath).pull();
     } else {
       logger.log(`[git] Cloning ${url} -> ${repoPath}`);
-      await simpleGit().clone(url, repoPath, ['--depth', '1']);
+      await simpleGit().clone(authenticatedUrl, repoPath, ['--depth', '1']);
     }
 
     return {
@@ -53,6 +56,14 @@ export class GitCloneService {
       }
     }
     return results;
+  }
+
+  private injectToken(url: string): string {
+    if (!env.GITHUB_TOKEN) return url;
+    const parsed = new URL(url);
+    parsed.username = 'x-access-token';
+    parsed.password = env.GITHUB_TOKEN;
+    return parsed.toString();
   }
 
   private validateUrl(url: string): void {

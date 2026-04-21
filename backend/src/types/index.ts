@@ -1,3 +1,21 @@
+// ---- Token usage types ----
+
+export interface RawTokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  cacheCreationInputTokens: number;
+  cacheReadInputTokens: number;
+}
+
+export interface TokenUsageSummary extends RawTokenUsage {
+  totalCost: number; // USD
+}
+
+export interface LlmResult {
+  text: string;
+  usage: RawTokenUsage;
+}
+
 // ---- Repository types ----
 
 export interface RepoInfo {
@@ -64,6 +82,7 @@ export interface FeaturesResponse {
   features: Feature[];
   rawText: string;
   generatedAt: string;
+  tokenUsage?: TokenUsageSummary;
 }
 
 // ---- BRD types ----
@@ -81,6 +100,7 @@ export interface BrdResponse {
   downloadUrl: string;
   previewText: string;
   generatedAt: string;
+  tokenUsage?: TokenUsageSummary;
 }
 
 export interface BrdMeta {

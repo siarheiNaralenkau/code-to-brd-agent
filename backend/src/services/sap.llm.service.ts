@@ -1,3 +1,6 @@
+import * as https from 'node:https';
+import { URL } from 'node:url';
+import { env } from '../config/env';
 import {
   FEATURE_EXTRACTION_SYSTEM_PROMPT,
   buildFeatureExtractionUserPrompt,
@@ -7,6 +10,8 @@ import {
   buildBrdGenerationUserPrompt,
 } from '../prompts/brd-generation.prompt';
 import { logger } from '../utils/logger';
+import { estimateTokens } from '../utils/token-estimate.utils';
+import { LlmResult } from '../types';
 
 interface SapLlmConfig {
   SAP_LLM_ENDPOINT_URL: string;
@@ -28,17 +33,29 @@ interface AnthropicContentBlock {
   text?: string;
 }
 
+interface AnthropicUsage {
+  input_tokens: number;
+  output_tokens: number;
+  cache_creation_input_tokens?: number;
+  cache_read_input_tokens?: number;
+}
+
+interface SapLlmResponse {
+  content: AnthropicContentBlock[];
+  usage?: AnthropicUsage;
+}
+
 export class SapLlmService {
   private cachedToken: TokenCache | null = null;
 
   constructor(private readonly config: SapLlmConfig) {}
 
-  async extractFeatureRequirements(astSummary: string, _model: string): Promise<string> {
+  async extractFeatureRequirements(astSummary: string, _model: string): Promise<LlmResult> {
     logger.log(`[sap-llm] Extracting feature requirements...`);
+    logger.log(`[sap-llm] astSummary input tokens (estimated): ${estimateTokens(astSummary)}`);
     return this.callLlm(
       FEATURE_EXTRACTION_SYSTEM_PROMPT,
       buildFeatureExtractionUserPrompt(astSummary),
-      8192,
     );
   }
 
@@ -46,12 +63,13 @@ export class SapLlmService {
     featureRequirements: string,
     astSummary: string,
     _model: string,
-  ): Promise<string> {
+  ): Promise<LlmResult> {
     logger.log(`[sap-llm] Generating BRD...`);
+    logger.log(`[sap-llm] featureRequirements input tokens (estimated): ${estimateTokens(featureRequirements)}`);
+    logger.log(`[sap-llm] astSummary input tokens (estimated): ${estimateTokens(astSummary)}`);
     return this.callLlm(
       BRD_GENERATION_SYSTEM_PROMPT,
       buildBrdGenerationUserPrompt(featureRequirements, astSummary),
-      16000,
     );
   }
 
@@ -92,40 +110,70 @@ export class SapLlmService {
     return this.cachedToken.value;
   }
 
-  private async callLlm(
-    systemPrompt: string,
-    userPrompt: string,
-    maxTokens: number,
-  ): Promise<string> {
+  private async callLlm(systemPrompt: string, userPrompt: string): Promise<LlmResult> {
+    const maxTokens = env.LLM_MAX_OUTPUT_TOKENS;
+    const timeoutMs = env.LLM_REQUEST_TIMEOUT_SECONDS * 1000;
     const token = await this.getAccessToken();
-    const url = `${this.config.SAP_LLM_ENDPOINT_URL}/v2/inference/deployments/${this.config.SAP_LLM_DEPLOYMENT_ID}/invoke`;
-
-    logger.log(`[sap-llm] Sending request to SAP inference endpoint...`);
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        anthropic_version: this.config.SAP_LLM_ANTHROPIC_VERSION,
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }],
-      }),
+    const rawUrl = `${this.config.SAP_LLM_ENDPOINT_URL}/v2/inference/deployments/${this.config.SAP_LLM_DEPLOYMENT_ID}/invoke`;
+    const parsedUrl = new URL(rawUrl);
+    const body = JSON.stringify({
+      anthropic_version: this.config.SAP_LLM_ANTHROPIC_VERSION,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
     });
 
-    if (!response.ok) {
-      const body = await response.text();
-      throw new Error(`SAP LLM request failed (${response.status}): ${body}`);
-    }
+    logger.log(`[sap-llm] Sending request to SAP inference endpoint...`);
+    const responseBody = await new Promise<string>((resolve, reject) => {
+      const req = https.request(
+        {
+          hostname: parsedUrl.hostname,
+          port: parsedUrl.port || 443,
+          path: parsedUrl.pathname + parsedUrl.search,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'Content-Length': Buffer.byteLength(body),
+          },
+        },
+        (res) => {
+          let data = '';
+          res.on('data', (chunk: Buffer) => (data += chunk.toString()));
+          res.on('end', () => {
+            if (res.statusCode && res.statusCode >= 400) {
+              reject(new Error(`SAP LLM request failed (${res.statusCode}): ${data}`));
+            } else {
+              resolve(data);
+            }
+          });
+        },
+      );
+
+      req.setTimeout(timeoutMs, () => {
+        req.destroy(new Error(`SAP LLM request timed out after ${timeoutMs / 1000}s`));
+      });
+
+      req.on('error', reject);
+      req.write(body);
+      req.end();
+    });
 
     logger.log(`[sap-llm] Response received, parsing content...`);
-    const data = (await response.json()) as { content: AnthropicContentBlock[] };
+    const data = JSON.parse(responseBody) as SapLlmResponse;
     const textBlock = data.content?.find((b) => b.type === 'text');
     if (!textBlock?.text) {
       throw new Error('SAP LLM returned no text content');
     }
-    return textBlock.text;
+
+    return {
+      text: textBlock.text,
+      usage: {
+        inputTokens: data.usage?.input_tokens ?? 0,
+        outputTokens: data.usage?.output_tokens ?? 0,
+        cacheCreationInputTokens: data.usage?.cache_creation_input_tokens ?? 0,
+        cacheReadInputTokens: data.usage?.cache_read_input_tokens ?? 0,
+      },
+    };
   }
 }

@@ -94,6 +94,10 @@ SAP_LLM_AUTH_CLIENT_ID=           # OAuth2 client ID
 SAP_LLM_AUTH_CLIENT_SECRET=       # OAuth2 client secret
 SAP_LLM_ANTHROPIC_VERSION=bedrock-2023-05-31
 
+# ── LLM request limits ────────────────────────────────────────────────────────
+LLM_MAX_OUTPUT_TOKENS=16000        # Maximum tokens the model may generate per request (applies to both providers)
+LLM_REQUEST_TIMEOUT_SECONDS=600    # HTTP request timeout in seconds (applies to both providers)
+
 # ── Storage ───────────────────────────────────────────────────────────────────
 REPOS_ROOT=./data/repos            # Where cloned repositories are stored (relative to backend/)
 OUTPUT_ROOT=./data/outputs         # Where generated BRDs and feature docs are saved
